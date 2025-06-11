@@ -54,6 +54,11 @@ void Renderer::OnResize(uint32_t width, uint32_t height) {
 
 }
 
+void Renderer::SetLightDir(glm::vec3 lightDir)
+{
+	this->m_lightDir = lightDir;
+}
+
 glm::vec4 Renderer::PerPixel(glm::vec2 coord)
 {
 	uint8_t r = (uint8_t)(coord.x * 255.0f);
@@ -99,9 +104,9 @@ glm::vec4 Renderer::PerPixel(glm::vec2 coord)
 	glm::vec3 sphereColor = glm::vec3(1,0,1);
 
 
-	glm::vec3 ligthDir = glm::normalize(glm::vec3(-1, -1, -1));
+	m_lightDir = glm::normalize(m_lightDir);
 
-	float d = glm::max(glm::dot(normal, -ligthDir), 0.0f);
+	float d = glm::max(glm::dot(normal, -m_lightDir), 0.0f);
 
 	sphereColor *= d;
 

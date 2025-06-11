@@ -15,8 +15,10 @@ public:
 	{
 		ImGui::Begin("Settings");
 		ImGui::Text("Last Render: %.03fms", m_LastRenderTime);
-		if (ImGui::Button("Render"))
-			Render();
+		ImGui::SliderFloat("Light X Position", &light.x, -1.0f, 1.0f);
+		ImGui::SliderFloat("Light Y Position", &light.y, -1.0f, 1.0f);
+		ImGui::SliderFloat("Light Z Position", &light.z, -1.0f, 1.0f);
+		ImGui::Text("Light: (%.03f,%.03f,%.03f)", light.x, light.y, light.z);
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -25,6 +27,7 @@ public:
 		m_ViewportWidth = ImGui::GetContentRegionAvail().x;
 		m_ViewportHeight = ImGui::GetContentRegionAvail().y;
 
+		m_Renderer.SetLightDir(light);
 
 		auto image = m_Renderer.GetFinalImage();
 		if (image)
@@ -50,7 +53,8 @@ private:
 	Renderer m_Renderer;
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 	float m_LastRenderTime = 0.0f;
-};
+	glm::vec3 light = glm::vec3(-1.0f);
+}; 
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)
 {
