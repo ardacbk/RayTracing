@@ -5,20 +5,26 @@
 #include "Walnut/Timer.h"
 
 #include "Renderer.h"
+#include "Camera.h"
 
 using namespace Walnut;
 
 class RayTracingLayer : public Walnut::Layer
 {
 public:
+	RayTracingLayer() 
+		: m_Camera(45.0f,0.1f,100.0f){}
+	virtual void OnUpdate(float ts) override {
+		m_Camera.OnUpdate(ts);
+	}
 	virtual void OnUIRender() override
 	{
 		ImGui::Begin("Settings");
-		ImGui::Text("Last Render: %.03fms", m_LastRenderTime);
-		ImGui::SliderFloat("Light X Position", &light.x, -1.0f, 1.0f);
-		ImGui::SliderFloat("Light Y Position", &light.y, -1.0f, 1.0f);
-		ImGui::SliderFloat("Light Z Position", &light.z, -1.0f, 1.0f);
-		ImGui::Text("Light: (%.03f,%.03f,%.03f)", light.x, light.y, light.z);
+		ImGui::Text("Last render: %.3fms", m_LastRenderTime);
+		ImGui::SliderFloat("Light X Position", &m_Light.x, -1.0f, 1.0f);
+		ImGui::SliderFloat("Light Y Position", &m_Light.y, -1.0f, 1.0f);
+		ImGui::SliderFloat("Light Z Position", &m_Light.z, -1.0f, 1.0f);
+		ImGui::Text("Light: (%.03f,%.03f,%.03f)", m_Light.x, m_Light.y, m_Light.z);
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -27,7 +33,7 @@ public:
 		m_ViewportWidth = ImGui::GetContentRegionAvail().x;
 		m_ViewportHeight = ImGui::GetContentRegionAvail().y;
 
-		m_Renderer.SetLightDir(light);
+		m_Renderer.SetLightDir(m_Light);
 
 		auto image = m_Renderer.GetFinalImage();
 		if (image)
@@ -42,18 +48,21 @@ public:
 
 	void Render() {
 		Timer timer;
-		
+
 		m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
-		m_Renderer.Render();
-		
+		m_Camera.OnResize(m_ViewportWidth, m_ViewportHeight);
+		m_Renderer.Render(m_Camera);
+
 		m_LastRenderTime = timer.ElapsedMillis();
 	}
 
 private:
 	Renderer m_Renderer;
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+	glm::vec3 m_Light = glm::vec3(-1.0f);
+	Camera m_Camera;
+
 	float m_LastRenderTime = 0.0f;
-	glm::vec3 light = glm::vec3(-1.0f);
 }; 
 
 Walnut::Application* Walnut::CreateApplication(int argc, char** argv)

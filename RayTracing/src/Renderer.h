@@ -1,23 +1,25 @@
 #pragma once
 
+#include <memory>
+
 #include "Walnut/Image.h"
 #include "glm/glm.hpp"
 
-
-#include <memory>
+#include "Camera.h"
+#include "Ray.h"
 
 class Renderer {
 public:
 	Renderer() = default;
 
 
-	void Render();
+	void Render(const Camera &camera);
 	void OnResize(uint32_t width, uint32_t height);
 	std::shared_ptr<Walnut::Image> GetFinalImage() const { return m_FinalImage; }
-	void SetLightDir(glm::vec3 lightDir);
+	void SetLightDir(glm::vec3 lightDir) {	this->m_lightDir = lightDir;	}
 
 private:
-	glm::vec4 PerPixel(glm::vec2 coord);
+	glm::vec4 TraceRay(const Ray& ray);
 private:
 	std::shared_ptr<Walnut::Image> m_FinalImage;
 	uint32_t* m_ImageData = nullptr;
