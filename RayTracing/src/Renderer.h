@@ -7,19 +7,20 @@
 
 #include "Camera.h"
 #include "Ray.h"
+#include "Scene.h"
 
 class Renderer {
 public:
 	Renderer() = default;
 
 
-	void Render(const Camera &camera);
+	void Render(const Scene& scene,const Camera &camera);
 	void OnResize(uint32_t width, uint32_t height);
 	std::shared_ptr<Walnut::Image> GetFinalImage() const { return m_FinalImage; }
 	void SetLightDir(glm::vec3 lightDir) {	this->m_lightDir = lightDir;	}
 
 private:
-	glm::vec4 TraceRay(const Ray& ray);
+	glm::vec4 TraceRay(const Scene& scene,const Ray& ray);
 private:
 	std::shared_ptr<Walnut::Image> m_FinalImage;
 	uint32_t* m_ImageData = nullptr;

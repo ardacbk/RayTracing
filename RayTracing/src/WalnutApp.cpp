@@ -1,8 +1,8 @@
 #include "Walnut/Application.h"
 #include "Walnut/EntryPoint.h"
-
 #include "Walnut/Image.h"
 #include "Walnut/Timer.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include "Renderer.h"
 #include "Camera.h"
@@ -13,7 +13,22 @@ class RayTracingLayer : public Walnut::Layer
 {
 public:
 	RayTracingLayer() 
-		: m_Camera(45.0f,0.1f,100.0f){}
+		: m_Camera(45.0f,0.1f,100.0f){
+
+			{
+				Sphere sphere;
+				sphere.Position = { 0.0f, 0.0f , 0.0f };
+				sphere.Albedo = { 1.0f, 0, 1.0f };
+				m_Scene.Spheres.push_back(sphere);
+			}
+			{
+				Sphere sphere;
+				sphere.Position = { 1.0f, 0.0f , -5.0f };
+				sphere.Radius = 1.5f;
+				sphere.Albedo = { 0.2f, 0.3f, 1.0f };
+				m_Scene.Spheres.push_back(sphere);
+			}
+	}
 	virtual void OnUpdate(float ts) override {
 		m_Camera.OnUpdate(ts);
 	}
@@ -21,12 +36,22 @@ public:
 	{
 		ImGui::Begin("Settings");
 		ImGui::Text("Last render: %.3fms", m_LastRenderTime);
-		ImGui::SliderFloat("Light X Position", &m_Light.x, -1.0f, 1.0f);
-		ImGui::SliderFloat("Light Y Position", &m_Light.y, -1.0f, 1.0f);
-		ImGui::SliderFloat("Light Z Position", &m_Light.z, -1.0f, 1.0f);
-		ImGui::Text("Light: (%.03f,%.03f,%.03f)", m_Light.x, m_Light.y, m_Light.z);
 		ImGui::End();
-
+		ImGui::Begin("Scene");
+		ImGui::Text("Light: (%.03f,%.03f,%.03f)", m_Light.x, m_Light.y, m_Light.z);
+		ImGui::Separator();
+		ImGui::DragFloat3("Light X Position", glm::value_ptr(m_Light), 0.01f, -1.0f, 1.0f);
+		for (int i = 0; i < m_Scene.Spheres.size(); i++) {
+			ImGui::PushID(i);
+			Sphere& sphere = m_Scene.Spheres[i];
+			ImGui::Text("Sphere %d", i);
+			ImGui::DragFloat3("Position", glm::value_ptr(sphere.Position), 0.1f);
+			ImGui::DragFloat("Radius", &sphere.Radius, 0.1f);
+			ImGui::ColorEdit3("Albedo", glm::value_ptr(sphere.Albedo), 0.1f);
+			ImGui::Separator();
+			ImGui::PopID();
+		}
+		ImGui::End();
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 		ImGui::Begin("Viewport");
 
@@ -51,7 +76,7 @@ public:
 
 		m_Renderer.OnResize(m_ViewportWidth, m_ViewportHeight);
 		m_Camera.OnResize(m_ViewportWidth, m_ViewportHeight);
-		m_Renderer.Render(m_Camera);
+		m_Renderer.Render(m_Scene,m_Camera);
 
 		m_LastRenderTime = timer.ElapsedMillis();
 	}
@@ -61,6 +86,7 @@ private:
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
 	glm::vec3 m_Light = glm::vec3(-1.0f);
 	Camera m_Camera;
+	Scene m_Scene;
 
 	float m_LastRenderTime = 0.0f;
 }; 
