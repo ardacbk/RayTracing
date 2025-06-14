@@ -45,8 +45,10 @@ private:
 	const Scene* m_ActiveScene = nullptr;
 	const Camera* m_ActiveCamera = nullptr;
 	glm::vec3 m_lightDir;
-
 	Settings m_Settings;
+
+	// Multithreading iterators
+	std::vector<uint32_t> m_ImageHorizontalIter, m_ImageVerticalIter;
 
 	std::shared_ptr<Walnut::Image> m_FinalImage;
 	uint32_t* m_ImageData = nullptr;
