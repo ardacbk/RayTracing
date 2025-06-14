@@ -1,6 +1,10 @@
 # Screenshots from Project
-![Screenshot showing reflective materials and physically based rendering](screenshots/screenshot1.png)
-Screenshot showing reflective materials and physically based rendering
+Screenshots showing reflective materials and physically based rendering
+### Accumulation off
+![Accumulation off](screenshots/accumulation-off.png)
+
+### Accumulation on
+![Accumulation on](screenshots/accumulation-on.png)
 
 
 # Walnut App Template

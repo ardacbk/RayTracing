@@ -40,17 +40,29 @@ public:
 			}
 	}
 	virtual void OnUpdate(float ts) override {
-		m_Camera.OnUpdate(ts);
+		if (m_Camera.OnUpdate(ts))
+			m_Renderer.ResetFrameIndex();
 	}
 	virtual void OnUIRender() override
 	{
 		ImGui::Begin("Settings");
 		ImGui::Text("Last render: %.3fms", m_LastRenderTime);
+
+		ImGui::Checkbox("Accumulate", &m_Renderer.GetSettings().Accumulate);
+
+		if (ImGui::Button("Reset"))
+			m_Renderer.ResetFrameIndex();
+
 		ImGui::End();
+
+
+
 		ImGui::Begin("Scene");
 		ImGui::Text("Light: (%.03f,%.03f,%.03f)", m_Light.x, m_Light.y, m_Light.z);
 		ImGui::Separator();
 		ImGui::DragFloat3("Light X Position", glm::value_ptr(m_Light), 0.01f, -1.0f, 1.0f);
+
+
 		for (size_t i = 0; i < m_Scene.Spheres.size(); i++) {
 			ImGui::PushID(i);
 			Sphere& sphere = m_Scene.Spheres[i];
@@ -61,8 +73,12 @@ public:
 				ImGui::Separator();
 			ImGui::PopID();
 		}
+
+
+		ImGui::Text("MATERIALS");
 		for (size_t i = 0; i < m_Scene.Materials.size(); i++) {
 			ImGui::PushID(i);
+			ImGui::Text("Material %d", i);
 			Material& material = m_Scene.Materials[i];
 			ImGui::ColorEdit3("Albedo", glm::value_ptr(material.Albedo), 0.1f);
 			ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f );
