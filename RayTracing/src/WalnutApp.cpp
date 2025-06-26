@@ -23,7 +23,14 @@ public:
 		blueSphere.Albedo = { 0.2f, 0.3f, 1.0f };
 		blueSphere.Roughness = 0.1f;
 
-			
+
+		Material& orangeSphere = m_Scene.Materials.emplace_back();
+		orangeSphere.Albedo = { 0.8f, 0.5f, 0.2f };
+		orangeSphere.Roughness = 0.1f;
+		orangeSphere.EmisisonColor = orangeSphere.Albedo;
+		orangeSphere.EmissionPower = 2.0f;
+
+			//Sphere 1
 			{
 				Sphere sphere;
 				sphere.Position = { 0.0f, 0.0f , 0.0f };
@@ -31,6 +38,17 @@ public:
 				sphere.MaterialIndex = 0;
 				m_Scene.Spheres.push_back(sphere);
 			}
+
+			//Sphere 2
+			{
+				Sphere sphere;
+				sphere.Position = { 2.0f, 0.0f , 0.0f };
+				sphere.Radius = 1.0f;
+				sphere.MaterialIndex = 2;
+				m_Scene.Spheres.push_back(sphere);
+			}
+			
+			//Ground
 			{
 				Sphere sphere;
 				sphere.Position = { 0.0f, -101.0f , 0.0f };
@@ -38,6 +56,7 @@ public:
 				sphere.MaterialIndex = 1;
 				m_Scene.Spheres.push_back(sphere);
 			}
+
 	}
 	virtual void OnUpdate(float ts) override {
 		if (m_Camera.OnUpdate(ts))
@@ -58,10 +77,7 @@ public:
 
 
 		ImGui::Begin("Scene");
-		ImGui::Text("Light: (%.03f,%.03f,%.03f)", m_Light.x, m_Light.y, m_Light.z);
 		ImGui::Separator();
-		ImGui::DragFloat3("Light X Position", glm::value_ptr(m_Light), 0.01f, -1.0f, 1.0f);
-
 
 		for (size_t i = 0; i < m_Scene.Spheres.size(); i++) {
 			ImGui::PushID(i);
@@ -83,6 +99,8 @@ public:
 			ImGui::ColorEdit3("Albedo", glm::value_ptr(material.Albedo), 0.1f);
 			ImGui::DragFloat("Roughness", &material.Roughness, 0.05f, 0.0f, 1.0f );
 			ImGui::DragFloat("Metallic", &material.Metallic, 0.05f, 0.0f, 1.0f);
+			ImGui::ColorEdit3("EmissionColor", glm::value_ptr(material.EmisisonColor));
+			ImGui::DragFloat("EmissionPower", &material.EmissionPower, 0.05f, 0.0f, FLT_MAX);
 			ImGui::Separator();
 			ImGui::PopID();
 		}
@@ -93,7 +111,6 @@ public:
 		m_ViewportWidth = ImGui::GetContentRegionAvail().x;
 		m_ViewportHeight = ImGui::GetContentRegionAvail().y;
 
-		m_Renderer.SetLightDir(m_Light);
 
 		auto image = m_Renderer.GetFinalImage();
 		if (image)
@@ -119,7 +136,6 @@ public:
 private:
 	Renderer m_Renderer;
 	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
-	glm::vec3 m_Light = glm::vec3(-1.0f);
 	Camera m_Camera;
 	Scene m_Scene;
 

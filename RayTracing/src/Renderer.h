@@ -22,7 +22,6 @@ public:
 	void Render(const Scene& scene,const Camera &camera);
 	void OnResize(uint32_t width, uint32_t height);
 	std::shared_ptr<Walnut::Image> GetFinalImage() const { return m_FinalImage; }
-	void SetLightDir(glm::vec3 lightDir) {	this->m_lightDir = lightDir;	}
 
 	void ResetFrameIndex() { m_FrameIndex = 1; }
 	Settings& GetSettings() { return m_Settings; }
@@ -44,7 +43,6 @@ private:
 
 	const Scene* m_ActiveScene = nullptr;
 	const Camera* m_ActiveCamera = nullptr;
-	glm::vec3 m_lightDir;
 	Settings m_Settings;
 
 	// Multithreading iterators
