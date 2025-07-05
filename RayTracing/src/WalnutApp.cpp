@@ -36,8 +36,8 @@ public:
 				sphere.Position = { 0.0f, 0.0f , 0.0f };
 				sphere.Radius = 1.0f;
 				sphere.MaterialIndex = 0;
-				m_Scene.Spheres.push_back(sphere);
-			}
+				m_Scene.Hittables.push_back(std::make_unique<Sphere>(sphere));
+		}
 
 			//Sphere 2
 			{
@@ -45,7 +45,7 @@ public:
 				sphere.Position = { 2.0f, 0.0f , 0.0f };
 				sphere.Radius = 1.0f;
 				sphere.MaterialIndex = 2;
-				m_Scene.Spheres.push_back(sphere);
+				m_Scene.Hittables.push_back(std::make_unique<Sphere>(sphere));
 			}
 			
 			//Ground
@@ -54,7 +54,7 @@ public:
 				sphere.Position = { 0.0f, -101.0f , 0.0f };
 				sphere.Radius = 100.0f;
 				sphere.MaterialIndex = 1;
-				m_Scene.Spheres.push_back(sphere);
+				m_Scene.Hittables.push_back(std::make_unique<Sphere>(sphere));
 			}
 
 	}
@@ -79,15 +79,8 @@ public:
 		ImGui::Begin("Scene");
 		ImGui::Separator();
 
-		for (size_t i = 0; i < m_Scene.Spheres.size(); i++) {
-			ImGui::PushID(i);
-			Sphere& sphere = m_Scene.Spheres[i];
-			ImGui::Text("Sphere %d", i);
-			ImGui::DragFloat3("Position", glm::value_ptr(sphere.Position), 0.1f);
-			ImGui::DragFloat("Radius", &sphere.Radius, 0.1f);
-			ImGui::DragInt("Material", &sphere.MaterialIndex, 1.0f, 0, (int)m_Scene.Materials.size() - 1);
-				ImGui::Separator();
-			ImGui::PopID();
+		for (size_t i = 0; i < m_Scene.Hittables.size(); i++) {
+			m_Scene.Hittables[i]->DrawImGui(i, m_Scene.Materials.size());
 		}
 
 

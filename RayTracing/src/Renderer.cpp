@@ -2,6 +2,7 @@
 
 #include "Walnut/Random.h"
 
+
 #include <execution>
 
 namespace Utils {
@@ -122,8 +123,8 @@ glm::vec4 Renderer::PerPixel(uint32_t x, uint32_t y)
 
 
 
-		const Sphere& sphere = m_ActiveScene->Spheres[payload.ObjectIndex];
-		const Material& material = m_ActiveScene->Materials[sphere.MaterialIndex];
+		const Hittable* hittable = m_ActiveScene->Hittables[payload.ObjectIndex].get();
+		const Material& material = m_ActiveScene->Materials[hittable->MaterialIndex];
 
 		// light += material.Albedo * throughput;
 
@@ -148,40 +149,11 @@ Renderer::HitPayload Renderer::TraceRay(const Ray& ray)
 	int closestSphere = -1;
 	float hitDistance = std::numeric_limits<float>::max(); // or just FLT_MAX
 
-	for (size_t i = 0; i < m_ActiveScene->Spheres.size(); i++) {
+	for (size_t i = 0; i < m_ActiveScene->Hittables.size(); i++) {
 
-		const Sphere& sphere = m_ActiveScene->Spheres[i];
+		const Hittable* hittable = m_ActiveScene->Hittables[i].get();
 
-		glm::vec3 origin = ray.Origin - sphere.Position;
-
-		// (bx^2 + by^2)t^2 + 2(axbx + ayby)t + (ax^2 + ay^2 - r^2) = 0
-
-		// a = ray origin
-		// b = ray direction
-		// r = radius
-		// t = hit distance
-
-
-		float a = glm::dot(ray.Direction, ray.Direction);
-		float b = 2 * glm::dot(origin, ray.Direction);
-		float c = glm::dot(origin, origin) - sphere.Radius * sphere.Radius;
-
-
-		// Calculate the discriminant
-		// b^2 - 4ac
-
-		float disc = b * b - 4.0f * a * c;
-
-
-		// No hit return
-		if (disc < 0)
-			continue;
-
-		// (-b -+ sqrt(disc)) / 2a 
-
-		float t0 = (-b + glm::sqrt(disc)) / (2 * a); // Further hit point (unused for now)
-
-		float closestT = (-b - glm::sqrt(disc)) / (2 * a);
+		float closestT = hittable->Intersect(ray);
 
 		if (closestT > 0.0f && closestT < hitDistance) {
 			hitDistance = closestT;
@@ -204,12 +176,12 @@ Renderer::HitPayload Renderer::ClosestHit(const Ray& ray, float hitDistance, int
 	payload.HitDistance = hitDistance;
 	payload.ObjectIndex = objectIndex;
 
-	const Sphere& sphere = m_ActiveScene->Spheres[objectIndex];
-	glm::vec3 origin = ray.Origin - sphere.Position;
+	const Hittable* hittable = m_ActiveScene->Hittables[objectIndex].get();
+	glm::vec3 origin = ray.Origin - hittable->Position;
 	payload.WorldPosition = origin + ray.Direction * hitDistance;
 	payload.WorldNormal = glm::normalize(payload.WorldPosition);
 	
-	payload.WorldPosition += sphere.Position;
+	payload.WorldPosition += hittable->Position;
 
 	return payload;
 }

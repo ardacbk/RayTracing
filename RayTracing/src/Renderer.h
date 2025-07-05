@@ -25,7 +25,6 @@ public:
 
 	void ResetFrameIndex() { m_FrameIndex = 1; }
 	Settings& GetSettings() { return m_Settings; }
-private:
 	struct HitPayload {
 		float HitDistance;
 		glm::vec3 WorldPosition;
@@ -33,6 +32,7 @@ private:
 
 		uint32_t ObjectIndex;
 	};
+private:
 
 	glm::vec4 PerPixel(uint32_t x, uint32_t y); // RayGen in Vulkan.
 
