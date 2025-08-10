@@ -177,11 +177,9 @@ Renderer::HitPayload Renderer::ClosestHit(const Ray& ray, float hitDistance, int
 	payload.ObjectIndex = objectIndex;
 
 	const Hittable* hittable = m_ActiveScene->Hittables[objectIndex].get();
-	glm::vec3 origin = ray.Origin - hittable->Position;
-	payload.WorldPosition = origin + ray.Direction * hitDistance;
-	payload.WorldNormal = glm::normalize(payload.WorldPosition);
+	payload.WorldPosition = ray.Origin + ray.Direction * hitDistance;
+	payload.WorldNormal = hittable->CalculateWorldNormal(payload.WorldPosition);
 	
-	payload.WorldPosition += hittable->Position;
 
 	return payload;
 }

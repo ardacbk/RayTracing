@@ -20,10 +20,45 @@ struct Material {
 struct Hittable {
 	virtual float Intersect(const Ray& ray) const = 0;
 	virtual void DrawImGui(int i, int materialSize) = 0;
+	virtual glm::vec3 CalculateWorldNormal(const glm::vec3& hitPoint) const = 0;
 	int MaterialIndex;
 	glm::vec3 Position;
 };
 
+
+struct Plane : public Hittable {
+	glm::vec3 Normal{ 0.0f };
+	
+	float Intersect(const Ray& ray) const override {
+		
+		float denom = glm::dot(ray.Direction, glm::normalize(this->Normal));
+		if (glm::abs(denom) < 1e-6)
+			return -1;
+		glm::vec3 k = this->Position - ray.Origin;
+		float t = glm::dot(k,glm::normalize(this->Normal)) / denom;
+		if (t < 0)
+			return -1;
+		return t;
+	}
+
+	glm::vec3 CalculateWorldNormal(const glm::vec3& hitPoint) const override {
+		return glm::normalize(this->Normal);
+	}
+
+	void DrawImGui(int i, int materialSize) override {
+		ImGui::PushID(i);
+		ImGui::Text("Plane %d", i);
+		ImGui::DragFloat3("Position", glm::value_ptr(this->Position), 0.1f);
+		ImGui::DragFloat3("Normal", glm::value_ptr(this->Normal), 0.1f);
+		ImGui::DragInt("Material", &MaterialIndex, 1.0f, 0, (int)materialSize - 1);
+		ImGui::Separator();
+		ImGui::PopID();
+
+	}
+
+
+
+};
 
 struct Sphere : public Hittable {
 	float Radius = 0.5f;
@@ -62,6 +97,10 @@ struct Sphere : public Hittable {
 
 		return t1;
 
+	}
+
+	glm::vec3 CalculateWorldNormal(const glm::vec3& hitPoint) const override {
+		return glm::normalize(hitPoint - this->Position);
 	}
 
 	void DrawImGui(int i,int materialSize) override {

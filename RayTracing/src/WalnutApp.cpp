@@ -49,12 +49,19 @@ public:
 			}
 			
 			//Ground
+			//{
+			//	Sphere sphere;
+			//	sphere.Position = { 0.0f, -101.0f , 0.0f };
+			//	sphere.Radius = 100.0f;
+			//	sphere.MaterialIndex = 1;
+			//	m_Scene.Hittables.push_back(std::make_unique<Sphere>(sphere));
+			//}
 			{
-				Sphere sphere;
-				sphere.Position = { 0.0f, -101.0f , 0.0f };
-				sphere.Radius = 100.0f;
-				sphere.MaterialIndex = 1;
-				m_Scene.Hittables.push_back(std::make_unique<Sphere>(sphere));
+				Plane plane;
+				plane.Position = { 0.0f, -1.0f,0.0f };
+				plane.Normal = { 0.0f, 90.0f,0.0f };
+				plane.MaterialIndex = 1;
+				m_Scene.Hittables.push_back(std::make_unique<Plane>(plane));
 			}
 
 	}
